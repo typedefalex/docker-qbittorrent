@@ -4,7 +4,8 @@ MAINTAINER Werner Beroux <werner@beroux.com>
 
 # 1. Install qBittorrent-NoX
 # 2. Create symbolic links to simplify mounting
-RUN apt-get update \
+RUN set -x \
+    && apt-get update \
     && apt-get install -y qbittorrent-nox \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
