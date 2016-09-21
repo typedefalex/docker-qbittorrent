@@ -1,16 +1,16 @@
 FROM debian:jessie
 
-MAINTAINER Werner Beroux <werner@beroux.com>
-
-# 1. Install qBittorrent-NoX
-# 2. Create symbolic links to simplify mounting
 RUN set -x \
+    # Install qBittorrent-NoX
     && apt-get update \
     && apt-get install -y qbittorrent-nox \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+
+    # Add non-root user
     && useradd --system --uid 520 -m --shell /usr/sbin/nologin qbittorrent \
 
+    # Create symbolic links to simplify mounting
     && mkdir -p /home/qbittorrent/.config/qBittorrent \
     && chown qbittorrent:qbittorrent /home/qbittorrent/.config/qBittorrent \
     && ln -s /home/qbittorrent/.config/qBittorrent /config \
@@ -23,15 +23,12 @@ RUN set -x \
     && chown qbittorrent:qbittorrent /downloads
 
 # Default configuration file.
-ADD qBittorrent.conf /default/qBittorrent.conf
-ADD entrypoint.sh /
+COPY qBittorrent.conf /default/qBittorrent.conf
+COPY entrypoint.sh /
 
-VOLUME /config
-VOLUME /torrents
-VOLUME /downloads
+VOLUME ["/config", "/torrents", "/downloads"]
 
-EXPOSE 8080
-EXPOSE 6881
+EXPOSE 8080 6881
 
 USER qbittorrent
 
