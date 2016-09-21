@@ -1,5 +1,7 @@
 FROM debian:jessie
 
+ADD https://github.com/Yelp/dumb-init/releases/download/v1.1.3/dumb-init_1.1.3_amd64 /usr/local/bin/dumb-init
+
 RUN set -x \
     # Install qBittorrent-NoX
     && apt-get update \
@@ -20,7 +22,11 @@ RUN set -x \
     && ln -s /home/qbittorrent/.local/share/data/qBittorrent /torrents \
 
     && mkdir /downloads \
-    && chown qbittorrent:qbittorrent /downloads
+    && chown qbittorrent:qbittorrent /downloads \
+
+    # https://github.com/Yelp/dumb-init
+    && chmod +x /usr/local/bin/dumb-init
+
 
 # Default configuration file.
 COPY qBittorrent.conf /default/qBittorrent.conf
@@ -32,5 +38,5 @@ EXPOSE 8080 6881
 
 USER qbittorrent
 
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["dumb-init", "/entrypoint.sh"]
 CMD ["qbittorrent-nox"]
