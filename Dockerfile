@@ -1,11 +1,9 @@
 FROM debian:stretch-slim
 
-ADD https://github.com/Yelp/dumb-init/releases/download/v1.1.3/dumb-init_1.1.3_amd64 /usr/local/bin/dumb-init
-
 RUN set -x \
     # Install qBittorrent-NoX
     && apt-get update \
-    && apt-get install -y qbittorrent-nox \
+    && apt-get install -y qbittorrent-nox dumb-init \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
 
@@ -22,10 +20,7 @@ RUN set -x \
     && ln -s /home/qbittorrent/.local/share/data/qBittorrent /torrents \
 
     && mkdir /downloads \
-    && chown qbittorrent:qbittorrent /downloads \
-
-    # https://github.com/Yelp/dumb-init
-    && chmod +x /usr/local/bin/dumb-init
+    && chown qbittorrent:qbittorrent /downloads
 
 
 # Default configuration file.
