@@ -1,4 +1,4 @@
-FROM alpine:3.8
+FROM alpine:3.11.3
 
 # Install required packages
 RUN apk add --no-cache \
@@ -35,6 +35,8 @@ RUN set -x \
  && apk del --purge .build-deps \
  && rm -rf /tmp/*
 
+ENV LD_LIBRARY_PATH /usr/local/lib64
+
 RUN set -x \
     # Install build dependencies
  && apk add --no-cache -t .build-deps \
@@ -44,6 +46,7 @@ RUN set -x \
         make \
         libressl-dev \
         qt5-qttools-dev \
+        geoip-dev \
     # Build qBittorrent from source code
  && git clone https://github.com/qbittorrent/qBittorrent.git /tmp/qbittorrent \
  && cd /tmp/qbittorrent \
@@ -51,7 +54,7 @@ RUN set -x \
  && latesttag=$(git describe --tags `git rev-list --tags --max-count=1`) \
  && git checkout $latesttag \
     # Compile
- && PKG_CONFIG_PATH=/usr/local/lib/pkgconfig ./configure --disable-gui --disable-stacktrace \
+ && PKG_CONFIG_PATH=/usr/local/lib64/pkgconfig/ ./configure --disable-gui --disable-stacktrace \
  && make install \
     # Clean-up
  && cd / \
@@ -63,7 +66,9 @@ RUN set -x \
  && mkdir -p /home/qbittorrent/.config/qBittorrent \
  && mkdir -p /home/qbittorrent/.local/share/data/qBittorrent \
  && mkdir /downloads \
+ && mkdir /monitoring \
  && chmod go+rw -R /home/qbittorrent /downloads \
+ && chmod go+rw -R /home/qbittorrent /monitoring \
  && ln -s /home/qbittorrent/.config/qBittorrent /config \
  && ln -s /home/qbittorrent/.local/share/data/qBittorrent /torrents \
     # Check it works
